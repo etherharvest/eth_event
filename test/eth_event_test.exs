@@ -1,0 +1,2 @@
+defmodule EthEventTest do
+end
