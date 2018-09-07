@@ -48,6 +48,7 @@ defmodule EthEvent.Api.Balance do
   use EthEvent.Schema, method: "eth_getBalance"
 
   alias EthEvent.Decode
+  alias EthEvent.Encode
 
   event "Balance" do
     uint256 :balance
@@ -61,14 +62,14 @@ defmodule EthEvent.Api.Balance do
     {:ok, term()} | {:error, term()}
   def build_query(event, options)
 
-  def build_query(%__MODULE__{address: nil}, _options) do
-    {:error, "Address not specified"}
-  end
   def build_query(%__MODULE__{block_number: nil} = event, options) do
     build_query(%{event | block_number: "latest"}, options)
   end
   def build_query(%__MODULE__{address: address, block_number: number}, _) do
-    {:ok, [address, number]}
+    with {:ok, number} <- Encode.encode(:quantity, number),
+         {:ok, address} <- Encode.encode(:address, address) do
+      {:ok, [address, number]}
+    end
   end
 
   @doc """

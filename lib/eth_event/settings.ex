@@ -5,13 +5,24 @@ defmodule EthEvent.Settings do
   use Skogsra
 
   @doc """
-  Node URL.
+  Node URL. Defaults to `"http://localhost:8545"`.
 
   ```
   config :eth_event,
-    node_url: "https://example.com:8545"
+    node_url: "https://mainnet.infura.io/v3"
   ```
   """
-  app_env :node_url, :eth_event, :node_url,
+  app_env :eth_event_node_url, :eth_event, :node_url,
     default: "http://localhost:8545"
+
+  @doc """
+  Node URL. Defaults to `""`.
+
+  ```
+  config :eth_event,
+    node_key: "some key"
+  ```
+  """
+  app_env :eth_event_node_key, :eth_event, :node_key,
+    default: ""
 end

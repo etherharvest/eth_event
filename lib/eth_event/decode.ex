@@ -42,16 +42,14 @@ defmodule EthEvent.Decode do
   `-1`.
   """
 
-  @type eth_type ::
-  :bool |
-  {:uint, integer()} |
-  {:int, integer()} |
-  :address |
-  {:bytes, integer()}
+  @type basic_type
+          :: :bool
+           | :address
+           | {:uint, integer()}
+           | {:int, integer()}
+           | {:bytes, integer()}
 
-  @type eth_types :: list(eth_type())
-
-  @type eth_encoded :: binary()
+  @type basic_types :: [basic_type()]
 
   @doc """
   Decodes `data` according to a list of `types`.
@@ -63,7 +61,7 @@ defmodule EthEvent.Decode do
   {[100, -1], nil}
   ```
   """
-  @spec decode(eth_types(), eth_encoded()) :: {list(), term()} | :error
+  @spec decode(basic_types(), binary()) :: {list(), term()} | :error
   def decode(types, data)
 
   def decode(types, "0x" <> data) do
@@ -82,7 +80,7 @@ defmodule EthEvent.Decode do
   {:ok, -1}
   ```
   """
-  @spec cast(eth_type(), eth_encoded()) :: {:ok, term()} | :error
+  @spec cast(basic_type(), binary()) :: {:ok, term()} | :error
   def cast(type, value)
 
   def cast(type, "0x" <> value) do
@@ -291,11 +289,6 @@ defmodule EthEvent.Decode do
 
   @doc false
   def add_zero_padding(value, size) do
-    current_size = String.length(value)
-    if current_size < size do
-      String.duplicate("0", size - current_size) <> value
-    else
-      value
-    end
+    String.pad_leading(value, size, "0")
   end
 end

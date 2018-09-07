@@ -173,8 +173,9 @@ defmodule EthEvent.Schema do
   def build_query(event, options) do
     with {:ok, parameters} <- add_address(event),
          {:ok, new_parameters} <- add_from_block(parameters, options),
-         {:ok, new_parameters} <- add_to_block(new_parameters, options) do
-      add_topics(event, new_parameters)
+         {:ok, new_parameters} <- add_to_block(new_parameters, options),
+         {:ok, new_parameters} <- add_topics(event, new_parameters) do
+      {:ok, [new_parameters]}
     end
   end
 
@@ -210,7 +211,6 @@ defmodule EthEvent.Schema do
       "data" => data,
       "logIndex" => index,
       "topics" => topics,
-      "type" => type
     }
   ) do
     module
@@ -221,7 +221,7 @@ defmodule EthEvent.Schema do
     |> add(:block_hash, block_hash)
     |> add(:block_number, block_number)
     |> add(:index, index)
-    |> add(:type, type)
+    |> add(:type, (if block_number == "pending", do: "pending", else: "mined"))
   end
 
   @doc false
@@ -358,18 +358,14 @@ defmodule EthEvent.Schema do
     {:ok, %{}}
   end
   def add_address(%{address: addresses}) when is_list(addresses) do
-    with value when is_list(value) <-
-         Encode.encode({:array, :address}, addresses) do
-      {:ok, %{"address" => value}}
+    with {:ok, values} <- Encode.encode({:array, :address}, addresses) do
+      {:ok, %{"address" => values}}
     end
   end
   def add_address(%{address: "0x" <> _ = address}) do
-    with value when is_binary(value) <- Encode.encode(:address, address) do
+    with {:ok, value} <- Encode.encode(:address, address) do
       {:ok, %{"address" => value}}
     end
-  end
-  def add_address(%{address: other}) do
-    {:error, "Invalid address #{inspect other}"}
   end
   def add_address(event) do
     {:error, "Invalid event #{inspect event}"}
@@ -381,8 +377,7 @@ defmodule EthEvent.Schema do
       nil ->
         {:ok, params}
       from_block ->
-        with value when is_binary(value) <-
-             Encode.encode(:quantity, from_block) do
+        with {:ok, value} <- Encode.encode(:quantity, from_block) do
           {:ok, Map.put_new(params, "fromBlock", value)}
         end
     end
@@ -394,8 +389,7 @@ defmodule EthEvent.Schema do
       nil ->
         {:ok, params}
       to_block ->
-        with value when is_binary(value) <-
-             Encode.encode(:quantity, to_block) do
+        with {:ok, value} <- Encode.encode(:quantity, to_block) do
           {:ok, Map.put_new(params, "toBlock", value)}
         end
     end
@@ -434,8 +428,7 @@ defmodule EthEvent.Schema do
       nil ->
         add_topics(indexed, arguments, event, [nil | topics])
       value ->
-        with encoded when is_binary(encoded) <-
-             Encode.encode({:topic, type}, value) do
+        with {:ok, encoded} <- Encode.encode({:topic, type}, value) do
           add_topics(indexed, arguments, event, [encoded | topics])
         end
     end

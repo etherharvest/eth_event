@@ -1,6 +1,8 @@
 # EthEvent
 
-This app is a work in progress
+[![Build Status](https://travis-ci.org/etherharvest/eth_event.svg?branch=master)](https://travis-ci.org/etherharvest/eth_event) [![Hex pm](http://img.shields.io/hexpm/v/eth_event.svg?style=flat)](https://hex.pm/packages/eth_event) [![hex.pm downloads](https://img.shields.io/hexpm/dt/eth_event.svg?style=flat)](https://hex.pm/packages/eth_event)
+
+`EthEvent` is a library to declare and request Solidity events easily.
 
 ## Queries
 
@@ -17,7 +19,7 @@ address:
 ```
 contract SomeToken is ERC20 {
   Transfer(address indexed from, address indexed to, uint value);
-...
+  ...
   function transfer(address to, uint value) {
     ...
     emit Transfer(msg.sender, to, value)
@@ -41,7 +43,7 @@ defmodule Transfer do
 end
 ```
 
-The previously defined  module includes the functions `Transfer.query/1`,
+The previously defined module includes the functions `Transfer.query/1`,
 `Transfer.query/2` and a struct definition for the `Transfer` event e.g:
 
 Let's say we want to look for:
@@ -154,8 +156,7 @@ or with block hash:
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `eth_event` to your list of dependencies in `mix.exs`:
+To install just add the following to your dependencies:
 
 ```elixir
 def deps do
@@ -165,7 +166,11 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/eth_event](https://hexdocs.pm/eth_event).
+## Author
 
+Alexander de Sousa.
+
+## License
+
+`EthEvent` is released under the MIT License. See the LICENSE file for further
+details.
