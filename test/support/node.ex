@@ -18,7 +18,7 @@ defmodule EthEvent.Node do
     base = Settings.eth_event_node_url()
     case Settings.eth_event_node_key() do
       "" ->
-        base == url
+        "#{base}/" == url
       key when is_binary(key) ->
         "#{base}/#{key}" == url
     end
