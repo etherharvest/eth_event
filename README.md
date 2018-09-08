@@ -16,7 +16,7 @@ record that something changed in the contract's state. The following contract
 declares and `emit`s an event every time someone sends some tokens to other
 address:
 
-```
+```solidity
 contract SomeToken is ERC20 {
   Transfer(address indexed from, address indexed to, uint value);
   ...
@@ -106,7 +106,6 @@ the function `query/1` e.g:
 {:ok,
   %Balance{
     address: "0xd09de8b6b510aecd508a22811398f468e75c8c4d"
-    block_number: 42,
     balance: 100
   }
 }
@@ -123,7 +122,7 @@ To query the balance of the wallet address
 `0xd09de8b6b510aecd508a22811398f468e75c8c4d` for the block 42 there are two
 ways of doing it:
 
-Without block hash:
+Without block hash or block_number:
 
 ```
 > address = "0xd09de8b6b510aecd508a22811398f468e75c8c4d"
@@ -131,7 +130,7 @@ Without block hash:
 {:ok,
   %Balance{
     address: "0xd09de8b6b510aecd508a22811398f468e75c8c4d"
-    block_number: 42,
+    block_number: nil,
     block_hash: nil,
     balance: 100
   }
@@ -142,8 +141,7 @@ or with block hash:
 
 ```
 > address = "0xd09de8b6b510aecd508a22811398f468e75c8c4d"
-> {:ok, block} = Block.query(%Block{block_number: 42})
-> Balance.query(%{block | address: address})
+> Block.query!(block_number: 42) |> Balance.query(address: address)
 {:ok,
   %Balance{
     address: "0xd09de8b6b510aecd508a22811398f468e75c8c4d"
@@ -161,16 +159,7 @@ To install just add the following to your dependencies:
 ```elixir
 def deps do
   [
-    {:eth_event, "~> 0.1.0"}
+    {:eth_event, "~> 0.1"}
   ]
 end
 ```
-
-## Author
-
-Alexander de Sousa.
-
-## License
-
-`EthEvent` is released under the MIT License. See the LICENSE file for further
-details.

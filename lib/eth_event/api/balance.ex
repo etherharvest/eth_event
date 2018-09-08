@@ -12,9 +12,7 @@ defmodule EthEvent.Api.Balance do
   > balance
   %Balance{
     address: "0x93ecb3962981e1ba2928297cb09c1932aa2c9c51",
-    block_hash: "0xb7381ade07e036e0f9195446f54b6c5e6228a10d3ff750dedb8a5c2372db2b3c",
-    block_number: 0,
-    type: "mined",
+    block_hash: "0xb7381ade07e036e0f9195446f54b6c5e6228a10d3ff750ded(...)",
     balance: 100000000000000000000, # In Wei
     ...
   }
@@ -25,20 +23,11 @@ defmodule EthEvent.Api.Balance do
 
   ```
   > alias EthEvent.Api.{Block, Balance}
-  > {:ok, %Block{} = block} = Block.query(%Block{}) # Latest block.
-  > block
-  %Block{
-    block_number: 0,
-    block_hash: "0xb7381ade07e036e0f9195446f54b6c5e6228a10d3ff750dedb8a5c2372db2b3c",
-    type: "mined",
-    ...
-  }
-  > {:ok, %Balance{} = balance} = Balance.query(%{block | address: "0x93e..."})
-  > balance
+  > Block.query!() |> Balance.query!(address: "0x93e...")
   %Balance{
     address: "0x93ecb3962981e1ba2928297cb09c1932aa2c9c51",
-    block_hash: "0xb7381ade07e036e0f9195446f54b6c5e6228a10d3ff750dedb8a5c2372db2b3c",
-    block_number: 0,
+    block_hash: "0xb7381ade07e036e0f9195446f54b6c5e6228a10d3ff750ded(...)",
+    block_number: 1234,
     type: "mined",
     balance: 100000000000000000000, # In Wei
     ...

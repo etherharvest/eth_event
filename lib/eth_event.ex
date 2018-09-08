@@ -106,7 +106,6 @@ defmodule EthEvent do
   {:ok,
     %Balance{
       address: "0xd09de8b6b510aecd508a22811398f468e75c8c4d"
-      block_number: 42,
       balance: 100
     }
   }
@@ -123,7 +122,7 @@ defmodule EthEvent do
   `0xd09de8b6b510aecd508a22811398f468e75c8c4d` for the block 42 there are two
   ways of doing it:
 
-  Without block hash:
+  Without block hash or block_number:
 
   ```
   > address = "0xd09de8b6b510aecd508a22811398f468e75c8c4d"
@@ -131,7 +130,7 @@ defmodule EthEvent do
   {:ok,
     %Balance{
       address: "0xd09de8b6b510aecd508a22811398f468e75c8c4d"
-      block_number: 42,
+      block_number: nil,
       block_hash: nil,
       balance: 100
     }
@@ -142,8 +141,7 @@ defmodule EthEvent do
 
   ```
   > address = "0xd09de8b6b510aecd508a22811398f468e75c8c4d"
-  > {:ok, block} = Block.query(%Block{block_number: 42})
-  > Balance.query(%{block | address: address})
+  > Block.query!(block_number: 42) |> Balance.query(address: address)
   {:ok,
     %Balance{
       address: "0xd09de8b6b510aecd508a22811398f468e75c8c4d"
@@ -161,7 +159,7 @@ defmodule EthEvent do
   ```elixir
   def deps do
     [
-      {:eth_event, "~> 0.1.0"}
+      {:eth_event, "~> 0.1"}
     ]
   end
   ```

@@ -1,6 +1,8 @@
 defmodule EthEvent.SchemaTest do
   use ExUnit.Case, async: true
 
+  import Tesla.Mock
+
   alias EthEvent.Schema
 
   ##############
@@ -35,6 +37,18 @@ defmodule EthEvent.SchemaTest do
 
   #######
   # Tests
+
+  describe "query/2" do
+    setup do
+      mock &EthEvent.Node.server/1
+
+      :ok
+    end
+
+    test "queries event" do
+      assert [%Transfer{}] = Transfer.query!(from: "0x0")
+    end
+  end
 
   describe "get_type/1" do
     test "get_type for bool" do

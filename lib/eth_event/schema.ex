@@ -116,11 +116,36 @@ defmodule EthEvent.Schema do
         Schema.build_result(event, result)
       end
 
-      def query(event, options \\ []) do
+      def query(event \\ [], options \\ [])
+
+      def query(%{__struct__: _} = event, options) do
+        invalid_keys = [:__metadata__, :__struct__]
+        keys = Map.keys(struct(__MODULE__, %{})) -- invalid_keys
+
+        params =
+          options
+          |> Keyword.take(keys)
+          |> Enum.into(%{})
+
+        event
+        |> Map.from_struct()
+        |> Map.merge(params)
+        |> query(options)
+      end
+      def query(event, options) do
         new_event = Schema.copy_header(__MODULE__, event)
         with {:ok, query} <- build_query(new_event, options),
              {:ok, result} <- Transport.rpc(__method__(), query) do
           build_result(new_event, result)
+        end
+      end
+
+      def query!(event \\ [], options \\ []) do
+        case query(event, options) do
+          {:ok, event} ->
+            event
+          {:error, reason} ->
+            raise reason
         end
       end
 
@@ -134,25 +159,17 @@ defmodule EthEvent.Schema do
   @doc """
   Copies the header of an `event` to the `module` `event`.
   """
-  @spec copy_header(module(), t()) :: t()
+  @spec copy_header(module(), map() | t() | list()) :: t()
   def copy_header(module, event)
 
-  def copy_header(
-    module,
-    %{address: address,
-      block_hash: block_hash,
-      block_number: block_number,
-      index: index,
-      type: type}
-  ) do
-    header = [
-      address: address,
-      block_hash: block_hash,
-      block_number: block_number,
-      index: index,
-      type: type
-    ]
-    struct(module, header)
+  def copy_header(module, event) when is_list(event) do
+    new_event = Enum.into(event, %{})
+    copy_header(module, new_event)
+  end
+  def copy_header(module, event) when is_map(event) do
+    keys = Map.keys(struct(module, %{})) -- [:__metadata__, :__struct__]
+    new_event = Map.take(event, keys)
+    struct(module, new_event)
   end
 
   @doc """

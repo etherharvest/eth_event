@@ -1,7 +1,7 @@
 defmodule EthEvent.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.1.1"
   @root "https://github.com/etherharvest/eth_event"
 
   def project do
@@ -9,6 +9,7 @@ defmodule EthEvent.MixProject do
       app: :eth_event,
       version: @version,
       elixir: "~> 1.6",
+      elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       package: package(),
@@ -19,6 +20,13 @@ defmodule EthEvent.MixProject do
 
   #############
   # Application
+
+  defp elixirc_paths(:test) do
+    ["lib", "test/support"]
+  end
+  defp elixirc_paths(_) do
+    ["lib"]
+  end
 
   def application do
     [
@@ -43,7 +51,7 @@ defmodule EthEvent.MixProject do
   defp package do
     [
       description: "Ethereum event requester",
-      files: ["lib", "mix.exs", "README.md"],
+      files: ["lib", "mix.exs", "README.md", "test/support"],
       maintainers: ["Alexander de Sousa"],
       licenses: ["MIT"],
       links: %{
