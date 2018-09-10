@@ -7,7 +7,7 @@ defmodule EthEvent.Api.BlockTest do
 
   describe "query/2" do
     setup do
-      mock &EthEvent.Node.server/1
+      mock_global &EthEvent.TestNode.server/1
 
       :ok
     end

@@ -1,7 +1,24 @@
-defmodule EthEvent.Node do
-  alias EthEvent.Settings
+defmodule EthEvent.TestNode do
+  use Agent
 
   alias EthEvent.Encode
+  alias EthEvent.Settings
+
+  def start_link do
+    Agent.start_link(fn -> 0 end, name: __MODULE__)
+  end
+
+  def get_block do
+    name = __MODULE__
+    block = Agent.get_and_update(name, fn block -> {block, block + 1} end)
+    Encode.encode!(:quantity, block)
+  end
+
+  def server(%Tesla.Env{method: :post, body: body}) do
+      body
+      |> Jason.decode!()
+      |> process_payload()
+  end
 
   def server(%Tesla.Env{method: :post, body: body, url: url}) do
     if check_url(url) do
@@ -39,7 +56,7 @@ defmodule EthEvent.Node do
       "id" => id,
       "jsonrpc" => "2.0",
       "result" => %{
-        "number" => Encode.encode!(:quantity, 42),
+        "number" => get_block(),
         "hash" => "0x4d256e0bc11af8091043c13b07f0e59dd7c07172d4ba14d9f75454a3d182d71c",
         "extra" => [],
         "timestamp" => Encode.encode!(:quantity, :os.system_time(:seconds)),
@@ -64,7 +81,7 @@ defmodule EthEvent.Node do
       "result" => [%{
         "address" => address,
         "blockHash" => "0x4d256e0bc11af8091043c13b07f0e59dd7c07172d4ba14d9f75454a3d182d71c",
-        "blockNumber" => "0x27",
+        "blockNumber" => get_block(),
         "data" => "0x0000000000000000000000000000000000000000000000000000000000000064",
         "logIndex" => "0x0",
         "topics" => build_topics(topics)
